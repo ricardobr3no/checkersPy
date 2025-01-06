@@ -2,6 +2,8 @@ import arcade, os
 from board import Board
 from piece import Piece
 from config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
+import arcade.gui
+from ui import Ui
 
 
 class Game(arcade.Window):
@@ -13,16 +15,12 @@ class Game(arcade.Window):
         self.player_turn = 0
         self.mouse_pos = (0, 0)
         arcade.set_background_color(arcade.color.AMAZON)
-
+        self.ui = Ui()
 
     def turn_controller(self):
-        if self.player_turn == "W":
-            self.player_turn = "R"
-        else:
-            self.player_turn = "W"
-
+        self.player_turn = "R" if self.player_turn == "W" else "W"
         print("current turn: ", self.player_turn)
-        return self.player_turn
+        self.ui.update_turn(self.player_turn)
 
 
     def setup(self):
@@ -34,6 +32,9 @@ class Game(arcade.Window):
 
     def on_draw(self):
         self.clear()
+
+        self.ui.on_draw()
+
         self.board.draw_squares()
         self.board.pieces.draw()
 
@@ -51,6 +52,7 @@ class Game(arcade.Window):
             arcade.draw_circle_outline(self.selected_piece.center_x, self.selected_piece.center_y,
                                       self.selected_piece.radius*1.1, arcade.color.GOLD, border_width=3)
             self.board.draw_guides(self.selected_piece)
+
 
 
     def on_mouse_motion(self, x, y, dx, dy):
