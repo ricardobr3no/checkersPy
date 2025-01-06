@@ -4,14 +4,6 @@ from piece import Piece
 from config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
 
 
-def in_matrix(e, matrix: [list, tuple]):
-    """verifica se extiste algum elemento (e) na matrix"""
-    for row in matrix:
-        if row.count(e) > 0:
-            return True
-    return False
-
-
 class Game(arcade.Window):
 
     def __init__(self, width, height, title):
@@ -20,6 +12,7 @@ class Game(arcade.Window):
         self.selected_piece = None
         self.player_turn = 0
         self.mouse_pos = (0, 0)
+        arcade.set_background_color(arcade.color.AMAZON)
 
 
     def turn_controller(self):
@@ -42,17 +35,37 @@ class Game(arcade.Window):
     def on_draw(self):
         self.clear()
         self.board.draw_squares()
+        self.board.pieces.draw()
 
+        # show crowns and changing scale
+        for piece in self.board.pieces:
+            if piece.letra == self.player_turn:
+                piece.change_scale(self.mouse_pos)
+
+            if piece.is_king:
+                piece.show_crown()
+
+        # show how piece is selected
         if self.selected_piece and self.selected_piece.letra == self.player_turn:
             # draw outline in selected piece
-            arcade.draw_circle_filled(self.selected_piece.center_x, self.selected_piece.center_y,
-                                      self.selected_piece.radius*1.1, arcade.color.GOLD)
+            arcade.draw_circle_outline(self.selected_piece.center_x, self.selected_piece.center_y,
+                                      self.selected_piece.radius*1.1, arcade.color.GOLD, border_width=3)
             self.board.draw_guides(self.selected_piece)
 
-        self.board.pieces.draw()
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.mouse_pos = x, y
 
 
     def on_mouse_release(self, x, y, button, modifiers):
+
+        if x > WIN_HEIGHT:
+            return
+
+        if self.board.game_over:
+            self.setup()
+
+
         row, col = int(y/SQUARE_SIZE),  int(x/SQUARE_SIZE)
         get_piece = self.board.get_piece(row, col)
 
@@ -74,10 +87,9 @@ class Game(arcade.Window):
             has_kill_moves = self.board.get_piece_valid_moves(self.selected_piece)[1]
 
             if not jump_is_kill_jump or not has_kill_moves:
-                # se o primeiro pulo foi normal
+                # logica dos pulos consecutivos
                 self.selected_piece = None
                 self.turn_controller()
-
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:
             # se tiver selecionado e tiver clicado em posicao com outra piece do mesmo time, troca a selected_piece
@@ -88,9 +100,13 @@ class Game(arcade.Window):
             self.selected_piece = None
 
 
+        if self.board.game_over:
+            # game over logic
+            self.setup()
+
 
 def main():
-    game = Game(WIN_HEIGHT, WIN_HEIGHT, "checkersPy")
+    game = Game(WIN_WIDHT, WIN_HEIGHT, "checkersPy")
     game.setup()
     game.run()
     

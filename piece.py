@@ -10,6 +10,8 @@ class Piece(arcade.SpriteCircle):
         self.letra = "W" if self.row < 3 else "R"
         self.is_king = False
         self.radius = int(0.9 * SQUARE_SIZE // 2)
+        self.crown = arcade.SpriteSolidColor(int(SQUARE_SIZE/2), int(SQUARE_SIZE/2), arcade.color.GOLD)
+        self.directions_y = [1] if self.letra == "W" else [-1]
 
     def move(self, row, col):
         self.row, self.col = row, col
@@ -17,11 +19,16 @@ class Piece(arcade.SpriteCircle):
 
         if self.row in [0, 7]:
             self.is_king = True
+            self.directions_y = [-1, 1]
 
 
-    def update(self, mouse_pos: tuple):
-        if self.collides_with_point(mouse_pos):
-            pass
+    def show_crown(self):
+        self.crown.position = self.position
+        self.crown.draw()
+
+
+    def change_scale(self, mouse_pos: tuple):
+        self.scale = 1.1 if self.collides_with_point(mouse_pos) else 1
 
 
     def __repr__(self):
