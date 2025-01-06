@@ -5,5 +5,5 @@
 # install:
 pip install -r requirements.txt
 # run:
-pyt`hon main.py
+python main.py
 ```
