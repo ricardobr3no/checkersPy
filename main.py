@@ -16,6 +16,8 @@ class Game(arcade.Window):
         self.mouse_pos = (0, 0)
         arcade.set_background_color(arcade.color.AMAZON)
         self.ui = Ui()
+        self.is_killing = False
+
 
     def turn_controller(self):
         self.player_turn = "R" if self.player_turn == "W" else "W"
@@ -64,8 +66,8 @@ class Game(arcade.Window):
         if x > WIN_HEIGHT:
             return
 
-        if self.board.game_over:
-            self.setup()
+        # if self.board.game_over:
+        #     self.setup()
 
 
         row, col = int(y/SQUARE_SIZE),  int(x/SQUARE_SIZE)
@@ -80,31 +82,36 @@ class Game(arcade.Window):
 
         if not self.selected_piece:
             # pode selectionar um piece
-            self.selected_piece = get_piece
+            if isinstance(get_piece, Piece):
+                self.selected_piece = get_piece
+
 
         elif self.selected_piece.letra == self.player_turn and (row, col) in self.board.get_piece_valid_moves(self.selected_piece)[0]: # updade to in valid position!!
             # se tiver selecionado e clicar em posicao VALIDA, pode mover
             jump_is_kill_jump = self.board.get_piece_valid_moves(self.selected_piece)[1]
             self.board.move_piece(self.selected_piece, row, col)
             has_kill_moves = self.board.get_piece_valid_moves(self.selected_piece)[1]
+            self.is_killing = True if jump_is_kill_jump and has_kill_moves else False
 
             if not jump_is_kill_jump or not has_kill_moves:
                 # logica dos pulos consecutivos
                 self.selected_piece = None
                 self.turn_controller()
+                self.is_killing = False
+
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:
             # se tiver selecionado e tiver clicado em posicao com outra piece do mesmo time, troca a selected_piece
-            self.selected_piece = get_piece
-            print("change piece to :", get_piece, row, col)
+            if not self.is_killing: # nao pode trocar de piece se estiver em matança
+                self.selected_piece = get_piece
+                print("change piece to :", get_piece, row, col)
 
         else:
             self.selected_piece = None
 
 
-        if self.board.game_over:
-            # game over logic
-            self.setup()
+        # print(self.is_killing)
+
 
 
 def main():
