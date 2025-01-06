@@ -1,7 +1,7 @@
 import arcade
 from config import ROWS, COLS, SQUARE_SIZE, WIN_HEIGHT
 from piece import Piece
-from rich import print
+# from rich import print
 
 
 class Board:
