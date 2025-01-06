@@ -14,9 +14,10 @@ class Game(arcade.Window):
         self.selected_piece = None
         self.player_turn = 0
         self.mouse_pos = (0, 0)
-        arcade.set_background_color(arcade.color.AMAZON)
         self.ui = Ui()
         self.is_killing = False
+
+        arcade.set_background_color(arcade.color.AMAZON)
 
 
     def turn_controller(self):
@@ -66,10 +67,6 @@ class Game(arcade.Window):
         if x > WIN_HEIGHT:
             return
 
-        # if self.board.game_over:
-        #     self.setup()
-
-
         row, col = int(y/SQUARE_SIZE),  int(x/SQUARE_SIZE)
         get_piece = self.board.get_piece(row, col)
 
@@ -109,8 +106,6 @@ class Game(arcade.Window):
         else:
             self.selected_piece = None
 
-
-        # print(self.is_killing)
 
 
 

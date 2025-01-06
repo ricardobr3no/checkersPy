@@ -85,12 +85,26 @@ class Board:
         self.check_game_over()
 
 
-    def get_piece_valid_moves(self, piece: Piece) -> list:
-        dir_y = 1 if piece.letra == "W" else -1
-        moves, has_kill_move = self.diags(piece)
-        return moves, has_kill_move
+    def get_piece_valid_moves(self, piece: Piece) -> tuple:
 
+        piece_team = [p for p in self.pieces if p.letra == piece.letra]
+        kill_moves = []
+        piece_moves, has_kill_move = self.diags(piece)
+        
+        for p in piece_team:
+            moves, has_kill_move = self.diags(p)
+            if has_kill_move:
+                kill_moves.append(moves)
+    
+        # print(kill_moves)
+        if kill_moves and piece_moves in kill_moves:
+            return piece_moves, has_kill_move
+        elif kill_moves and piece_moves not in kill_moves:
+            return [], has_kill_move
+        else:
+            return piece_moves, has_kill_move
 
+        
     def diags(self, piece: Piece) -> tuple:
         """dir_x e dir_y recebem -1 para left/down or +1 para right/up"""
         simple_moves = []
