@@ -1,5 +1,5 @@
 # CheckersPy
-<img src="https://github.com/ricardobr3no/checkersPy/blob/master/checkers.png" style="width:100px">
+<img src="https://github.com/ricardobr3no/checkersPy/blob/master/checkers.png" style="width:500px">
 
 ```
 # install:
