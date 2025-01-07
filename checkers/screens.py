@@ -1,9 +1,9 @@
 import arcade, os
 import arcade.gui
 
-from checkers.board import Board
-from checkers.piece import Piece
-from checkers.config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
+from .board import Board
+from .piece import Piece
+from .config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
 
 
 class Game(arcade.View):
@@ -148,7 +148,6 @@ class Game(arcade.View):
 
         else:
             self.selected_piece = None
-
 
 
 class Menu(arcade.View):

@@ -1,6 +1,6 @@
 import arcade
 from checkers.config import WIN_WIDHT, WIN_HEIGHT, WIN_TITLE
-from screens.game import Menu
+from checkers.screens import Menu
 
 
 def main():
