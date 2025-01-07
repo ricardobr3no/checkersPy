@@ -1,5 +1,5 @@
 import arcade
-from config import SQUARE_SIZE
+from checkers.config import SQUARE_SIZE
 
 class Piece(arcade.SpriteCircle):
     def __init__(self, color: arcade.Color, row_col: tuple):
