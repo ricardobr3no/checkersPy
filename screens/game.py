@@ -14,16 +14,65 @@ class Game(arcade.View):
         self.selected_piece = None
         self.player_turn = 0
         self.mouse_pos = (0, 0)
-        self.ui = GameUi()
         self.is_killing = False
 
         arcade.set_background_color(arcade.color.AMAZON)
+        self.ui_init() # iniciar ui
         self.setup()
+
+
+    def ui_init(self):
+        self.ui_manager = arcade.gui.UIManager()
+        self.ui_manager.enable()
+
+        # indicative turn
+        self.p1 = arcade.gui.UILabel(text="P1", text_color=arcade.color.WHITE, font_size=30, bold=True)
+        self.p2 = arcade.gui.UILabel(text="P2", text_color=arcade.color.RED, font_size=30, bold=True)
+        h_box = arcade.gui.UIBoxLayout(x=450, y=400, vertical=False)
+        h_box.add(self.p1)
+        h_box.add(self.p2)
+        h_box._space_between = 30
+
+        # buttons
+        start_button = arcade.gui.UIFlatButton(width=100, height=40, text="START")
+        exit_button = arcade.gui.UIFlatButton(width=100, height=40, text="MENU")
+
+        v_box = arcade.gui.UIBoxLayout( x=450, y=200,)
+        v_box.add(h_box)
+        v_box.add(start_button)
+        v_box.add(exit_button)
+        v_box._space_between = 20
+
+        self.ui_manager.add(v_box)
+        
+        @start_button.event("on_click")
+        def start_button_click(event):
+            # restart
+            game = Game()
+            self.window.show_view(game)
+
+        @exit_button.event("on_click")
+        def exit_button_click(event):
+            # exit or Menu
+            menu = Menu()
+            self.window.show_view(menu)
+
+
+    def ui_update_turn(self):
+        # update in future, not working for now
+        return
+        if self.player_turn == "W":
+            self.p1.label.font_size = 35
+            self.p2.label.font_size = 30
+        elif self.player_turn == "R":
+            self.p1.label.font_size = 30
+            self.p2.label.font_size = 35
+         
 
     def turn_controller(self):
         self.player_turn = "R" if self.player_turn == "W" else "W"
         print("current turn: ", self.player_turn)
-        self.ui.update_turn(self.player_turn)
+        # self.ui_update_turn()
 
 
     def setup(self):
@@ -36,8 +85,9 @@ class Game(arcade.View):
     def on_draw(self):
         self.clear()
 
-        self.ui.on_draw()
-        # self.ui.update_turn(self.player_turn)
+        self.ui_manager.draw()
+        self.ui_update_turn()
+
         self.board.draw_squares()
         self.board.pieces.draw()
 
@@ -71,15 +121,12 @@ class Game(arcade.View):
         print(get_piece, row, col)
         print("current turn:", self.player_turn)
 
-        if not self.selected_piece and get_piece == 0:
-            return
-
         if not self.selected_piece:
             # pode selectionar um piece
             if isinstance(get_piece, Piece):
                 self.selected_piece = get_piece
 
-        elif self.selected_piece.letra == self.player_turn and (row, col) in self.board.get_piece_valid_moves(self.selected_piece)[0]: # updade to in valid position!!
+        elif self.selected_piece.letra == self.player_turn and (row, col) in self.board.get_piece_valid_moves(self.selected_piece)[0]: 
             # se tiver selecionado e clicar em posicao VALIDA, pode mover
             jump_is_kill_jump = self.board.diags(self.selected_piece)[1]
             self.board.move_piece(self.selected_piece, row, col)
@@ -91,9 +138,7 @@ class Game(arcade.View):
                 self.selected_piece = None
                 self.turn_controller()
                 self.is_killing = False
-
             print(self.is_killing)
-
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:
             # se tiver selecionado e tiver clicado em posicao com outra piece do mesmo time, troca a selected_piece
@@ -104,61 +149,6 @@ class Game(arcade.View):
         else:
             self.selected_piece = None
 
-
-class GameUi(arcade.View):
-    def __init__(self):
-        super().__init__()
-
-        self.ui_manager = arcade.gui.UIManager()
-        self.ui_manager.enable()
-
-        # indicative turn
-        self.p1 = arcade.gui.UILabel(text="P1", text_color=arcade.color.WHITE, font_size=30, bold=True)
-        self.p2 = arcade.gui.UILabel(text="P2", text_color=arcade.color.RED, font_size=30, bold=True)
-        h_box = arcade.gui.UIBoxLayout(x=450, y=400, vertical=False)
-        h_box.add(self.p1)
-        h_box.add(self.p2)
-        h_box._space_between = 30
-
-        # buttons
-        start_button = arcade.gui.UIFlatButton(width=100, height=40, text="START")
-        exit_button = arcade.gui.UIFlatButton(width=100, height=40, text="MENU")
-
-        v_box = arcade.gui.UIBoxLayout( x=450, y=200,)
-        v_box.add(h_box)
-        v_box.add(start_button)
-        v_box.add(exit_button)
-        v_box._space_between = 20
-
-        self.ui_manager.add(v_box)
-        
-        @start_button.event("on_click")
-        def start_button_click(event):
-            # restart
-            print("oi")
-            game = Game()
-            self.window.show_view(game)
-
-        @exit_button.event("on_click")
-        def exit_button_click(event):
-            # exit or Menu
-            menu = Menu()
-            self.window.show_view(menu)
-
-    
-    def update_turn(self, turn: str):
-        return
-        if turn == "W":
-            self.p1.label.font_size = 35
-            self.p2.label.font_size = 30
-        if turn == "R":
-            self.p1.label.font_size = 30
-            self.p2.label.font_size = 35
-
-
-    def on_draw(self):
-        arcade.start_render()
-        self.ui_manager.draw()
 
 
 class Menu(arcade.View):

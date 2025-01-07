@@ -20,6 +20,7 @@ class Board:
         for row in self.board:
             print(row)
 
+
     def create_board(self):
         self.board.clear() # restart board
         self.pieces.clear()
@@ -51,6 +52,7 @@ class Board:
         self.mostrar_board()
 			    
         
+
     def draw_squares(self):
         # draw background
         arcade.draw_rectangle_filled(WIN_HEIGHT//2, WIN_HEIGHT//2, WIN_HEIGHT, WIN_HEIGHT, arcade.color.BLACK)
@@ -64,8 +66,10 @@ class Board:
                                              arcade.color.BROWN)
 
 
+
     def get_piece(self, row:int, col:int):
         return self.board[row][col]
+
 
 
     def move_piece(self, piece: Piece, row: int, col: int):
@@ -82,6 +86,7 @@ class Board:
             piece.move(row, col)
             # self.mostrar_board()
         self.check_game_over()
+
 
 
     def get_piece_valid_moves(self, piece: Piece) -> tuple:
