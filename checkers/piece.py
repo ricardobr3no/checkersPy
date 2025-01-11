@@ -6,11 +6,13 @@ class Piece(arcade.SpriteCircle):
         super().__init__(color=color, radius=int(0.9 * SQUARE_SIZE //2))
         self.row, self.col = row_col
         self.color = color
-        self.position = self.col * SQUARE_SIZE + SQUARE_SIZE//2, self.row * SQUARE_SIZE + SQUARE_SIZE//2
+        self.position = (self.col * SQUARE_SIZE + SQUARE_SIZE//2,
+                         self.row * SQUARE_SIZE + SQUARE_SIZE//2)
         self.letra = "W" if self.row < 3 else "R"
         self.is_king = False
         self.radius = int(0.9 * SQUARE_SIZE // 2)
-        self.crown = arcade.SpriteSolidColor(int(SQUARE_SIZE/2), int(SQUARE_SIZE/2), arcade.color.GOLD)
+        self.crown = arcade.Sprite(filename="./assets/coroa.png", scale=0.2, 
+                                   center_x=self.center_x, center_y=self.center_y)
         self.directions_y = [1] if self.letra == "W" else [-1]
 
     def move(self, row, col):

@@ -112,7 +112,11 @@ class Game(arcade.View):
 
 
     def on_mouse_release(self, x, y, button, modifiers):
-        if x > WIN_HEIGHT:
+        if x > WIN_HEIGHT or y > WIN_HEIGHT:
+            return
+
+        if self.player_turn == "R" and self.mode == 2:
+            # colocar logica da IA aqui
             return
 
         row, col = int(y/SQUARE_SIZE),  int(x/SQUARE_SIZE)
@@ -173,13 +177,15 @@ class Menu(arcade.View):
 
         @b_mode_1.event("on_click")
         def on_click_b1(event):
-            game_view = Game()
+            game_view = Game(mode=1)
             self.ui.disable()
             self.window.show_view(game_view)
             
         @b_mode_2.event("on_click")
         def on_click_b2(event):
-            print("oi")
+            game_view = Game(mode=2)
+            self.ui.disable()
+            self.window.show_view(game_view)
 
         @b_exit.event("on_click")
         def on_click_exit(event):
