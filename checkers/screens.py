@@ -8,8 +8,11 @@ from .config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
 
 class Game(arcade.View):
 
-    def __init__(self):
+    def __init__(self, mode: int = 1):
         super().__init__()
+        
+        self.mode = mode
+
         self.board = Board()
         self.selected_piece = None
         self.player_turn = 0
@@ -26,19 +29,18 @@ class Game(arcade.View):
         self.ui_manager.enable()
 
         # indicative turn
-        self.p1 = arcade.gui.UILabel(text="P1", text_color=arcade.color.WHITE, font_size=30, bold=True)
-        self.p2 = arcade.gui.UILabel(text="P2", text_color=arcade.color.RED, font_size=30, bold=True)
-        h_box = arcade.gui.UIBoxLayout(x=450, y=400, vertical=False)
-        h_box.add(self.p1)
-        h_box.add(self.p2)
-        h_box._space_between = 30
+        label_px, label_py = 480, 250
+        self.p1 = arcade.Text(text="P1", start_x=label_px, start_y=label_py,
+                              color=arcade.color.WHITE, font_size=30, bold=True)
+        self.p2 = arcade.Text(text="P2", start_x=label_px, start_y=label_py,
+                              color=arcade.color.RED, font_size=30, bold=True)
 
         # buttons
         start_button = arcade.gui.UIFlatButton(width=100, height=40, text="START")
         exit_button = arcade.gui.UIFlatButton(width=100, height=40, text="MENU")
 
         v_box = arcade.gui.UIBoxLayout( x=450, y=200,)
-        v_box.add(h_box)
+        # v_box.add(h_box)
         v_box.add(start_button)
         v_box.add(exit_button)
         v_box._space_between = 20
@@ -60,13 +62,10 @@ class Game(arcade.View):
 
     def ui_update_turn(self):
         # update in future, not working for now
-        return
         if self.player_turn == "W":
-            self.p1.label.font_size = 35
-            self.p2.label.font_size = 30
+            self.p1.draw()
         elif self.player_turn == "R":
-            self.p1.label.font_size = 30
-            self.p2.label.font_size = 35
+            self.p2.draw()
          
 
     def turn_controller(self):
@@ -85,9 +84,7 @@ class Game(arcade.View):
     def on_draw(self):
         self.clear()
 
-        self.ui_manager.draw()
-        self.ui_update_turn()
-
+        # draws board and pieces
         self.board.draw_squares()
         self.board.pieces.draw()
 
@@ -95,7 +92,6 @@ class Game(arcade.View):
         for piece in self.board.pieces:
             if piece.letra == self.player_turn:
                 piece.change_scale(self.mouse_pos)
-
             if piece.is_king:
                 piece.show_crown()
 
@@ -105,6 +101,10 @@ class Game(arcade.View):
             arcade.draw_circle_outline(self.selected_piece.center_x, self.selected_piece.center_y,
                                       self.selected_piece.radius*1.1, arcade.color.GOLD, border_width=3)
             self.board.draw_guides(self.selected_piece)
+
+        # draw ui
+        self.ui_manager.draw()
+        self.ui_update_turn()
 
 
     def on_mouse_motion(self, x, y, dx, dy):
