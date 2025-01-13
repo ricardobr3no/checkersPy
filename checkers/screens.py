@@ -30,6 +30,10 @@ class Game(arcade.View):
         self.ui_manager = arcade.gui.UIManager()
         self.ui_manager.enable()
 
+        # label winner
+        self.label_winner = arcade.Text(text="P1 WIN", start_x=100, start_y=200,
+                                        font_size=40, bold=True, font_name="comic sans MS")
+
         # indicative turn
         label_px, label_py = 480, 250
         self.p1 = arcade.Text(text="P1", start_x=label_px, start_y=label_py,
@@ -52,7 +56,7 @@ class Game(arcade.View):
         @start_button.event("on_click")
         def start_button_click(event):
             # restart
-            game = Game()
+            game = Game(mode=1 if self.mode == 1 else 2)
             self.window.show_view(game)
 
         @exit_button.event("on_click")
@@ -63,12 +67,19 @@ class Game(arcade.View):
 
 
     def ui_update_turn(self):
-        # update in future, not working for now
+        is_game_over, ganhador = self.board.check_game_over()
+        if is_game_over:
+            if ganhador == "W":
+                self.label_winner.text = "P1 WIN !!"
+            elif ganhador == "R":
+                self.label_winner.text = "P2 WIN !!"
+            self.label_winner.draw()
+
         if self.player_turn == "W":
             self.p1.draw()
         elif self.player_turn == "R":
             self.p2.draw()
-         
+
 
     def turn_controller(self):
         self.player_turn = "R" if self.player_turn == "W" else "W"
@@ -119,9 +130,13 @@ class Game(arcade.View):
 
 
     def ia_move(self):
+        ia_team = [p for p in self.board.pieces if p.letra == self.player_turn]
+        ia_valid_moves = []
+
+        if not ia_team:
+            return
+
         if self.mode == 2 and self.player_turn == "R":
-            ia_team = [p for p in self.board.pieces if p.letra == self.player_turn]
-            ia_valid_moves = []
 
             for piece in ia_team:
                 ia_moves, ia_has_kill_move = self.board.get_piece_valid_moves(piece)

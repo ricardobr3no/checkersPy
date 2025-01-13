@@ -148,5 +148,5 @@ class Board:
         if not white_pieces or not red_pieces:
             print("GAME_OVER")
             self.game_over = True
-            return True
-        return False
+            return (True, "W") if white_pieces else (True, "R")
+        return False, ""
