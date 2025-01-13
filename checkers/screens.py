@@ -95,7 +95,7 @@ class Game(arcade.View):
             if self.mode == 1:
                 if piece.letra == self.player_turn:
                     piece.change_scale(self.mouse_pos)
-            elif self.mode == 2:
+            else:
                 if piece.letra == "W":
                     piece.change_scale(self.mouse_pos)
 
@@ -180,7 +180,7 @@ class Game(arcade.View):
                 self.turn_controller()
                 self.is_killing = False
                 # ia here
-                # self.ia_move()
+                self.ia_move()
             print(self.is_killing)
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:
