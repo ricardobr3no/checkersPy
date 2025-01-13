@@ -15,10 +15,11 @@ class Piece(arcade.SpriteCircle):
                                    center_x=self.center_x, center_y=self.center_y)
         self.directions_y = [1] if self.letra == "W" else [-1]
 
+
     def move(self, row, col):
         self.row, self.col = row, col
-        self.position = self.col * SQUARE_SIZE + SQUARE_SIZE//2, self.row * SQUARE_SIZE + SQUARE_SIZE//2
-
+        self.position = (self.col * SQUARE_SIZE + SQUARE_SIZE//2,
+                         self.row * SQUARE_SIZE + SQUARE_SIZE//2)
         if self.row in [0, 7]:
             self.is_king = True
             self.directions_y = [-1, 1]

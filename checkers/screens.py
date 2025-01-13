@@ -1,9 +1,11 @@
-import arcade, os
+import arcade, os, time
 import arcade.gui
 
 from .board import Board
 from .piece import Piece
 from .config import WIN_WIDHT, WIN_HEIGHT, SQUARE_SIZE
+
+from random import choice
 
 
 class Game(arcade.View):
@@ -90,8 +92,13 @@ class Game(arcade.View):
 
         # show crowns and changing scale
         for piece in self.board.pieces:
-            if piece.letra == self.player_turn:
-                piece.change_scale(self.mouse_pos)
+            if self.mode == 1:
+                if piece.letra == self.player_turn:
+                    piece.change_scale(self.mouse_pos)
+            elif self.mode == 2:
+                if piece.letra == "W":
+                    piece.change_scale(self.mouse_pos)
+
             if piece.is_king:
                 piece.show_crown()
 
@@ -111,14 +118,44 @@ class Game(arcade.View):
         self.mouse_pos = x, y
 
 
+    def ia_move(self):
+        if self.mode == 2 and self.player_turn == "R":
+            ia_team = [p for p in self.board.pieces if p.letra == self.player_turn]
+            ia_valid_moves = []
+
+            for piece in ia_team:
+                ia_moves, ia_has_kill_move = self.board.get_piece_valid_moves(piece)
+                if ia_moves:
+                    ia_valid_moves.append({"piece": piece, "moves": ia_moves})
+
+            choiced = choice(ia_valid_moves)
+            choiced_piece = choiced["piece"]
+            choiced_move_row, choiced_move_col = choice(choiced["moves"])
+
+            # print(choiced_piece, choiced_move_row, choiced_move_col)
+            jump_is_kill_jump = self.board.diags(choiced_piece)[1]
+            self.board.move_piece(choiced_piece, choiced_move_row, choiced_move_col)
+            has_kill_moves = self.board.diags(choiced_piece)[1]
+
+            if jump_is_kill_jump:
+                while has_kill_moves: # vai entrar como True ou False
+                    print("entrou")
+                    moves, has_kill_moves = self.board.diags(choiced_piece)
+                    row, col = choice(moves)
+                    self.board.move_piece(choiced_piece, row, col)
+                    moves, has_kill_moves = self.board.diags(choiced_piece)
+
+                    if not has_kill_moves:
+                        break
+
+            self.turn_controller()
+
+
     def on_mouse_release(self, x, y, button, modifiers):
         if x > WIN_HEIGHT or y > WIN_HEIGHT:
             return
 
-        if self.player_turn == "R" and self.mode == 2:
-            # colocar logica da IA aqui
-            return
-
+        # human logic
         row, col = int(y/SQUARE_SIZE),  int(x/SQUARE_SIZE)
         get_piece = self.board.get_piece(row, col)
 
@@ -142,6 +179,8 @@ class Game(arcade.View):
                 self.selected_piece = None
                 self.turn_controller()
                 self.is_killing = False
+                # ia here
+                # self.ia_move()
             print(self.is_killing)
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:

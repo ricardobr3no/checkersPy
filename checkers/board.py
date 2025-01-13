@@ -66,10 +66,8 @@ class Board:
                                              arcade.color.BROWN)
 
 
-
     def get_piece(self, row:int, col:int):
         return self.board[row][col]
-
 
 
     def move_piece(self, piece: Piece, row: int, col: int):
