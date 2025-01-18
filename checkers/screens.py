@@ -74,7 +74,9 @@ class Game(arcade.View):
                 self.label_winner.text = "P1 WIN !!"
             elif ganhador == "R":
                 self.label_winner.text = "P2 WIN !!"
+
             self.label_winner.draw()
+            return
 
         if self.player_turn == "W":
             self.p1.draw()
