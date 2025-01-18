@@ -20,6 +20,7 @@ class Game(arcade.View):
         self.player_turn = 0
         self.mouse_pos = (0, 0)
         self.is_killing = False
+        self.timer = 0.0
 
         arcade.set_background_color(arcade.color.AMAZON)
         self.ui_init() # iniciar ui
@@ -125,6 +126,15 @@ class Game(arcade.View):
         self.ui_update_turn()
 
 
+    def on_update(self, delta_time):
+        if self.mode == 2 and self.player_turn == "R":
+            self.timer += delta_time 
+            if self.timer >= 1:
+                self.ia_move()
+        else:
+            self.timer = 0
+
+
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_pos = x, y
 
@@ -136,34 +146,32 @@ class Game(arcade.View):
         if not ia_team:
             return
 
-        if self.mode == 2 and self.player_turn == "R":
+        for piece in ia_team:
+            ia_moves, ia_has_kill_move = self.board.get_piece_valid_moves(piece)
+            if ia_moves:
+                ia_valid_moves.append({"piece": piece, "moves": ia_moves})
 
-            for piece in ia_team:
-                ia_moves, ia_has_kill_move = self.board.get_piece_valid_moves(piece)
-                if ia_moves:
-                    ia_valid_moves.append({"piece": piece, "moves": ia_moves})
+        choiced = choice(ia_valid_moves)
+        choiced_piece = choiced["piece"]
+        choiced_move_row, choiced_move_col = choice(choiced["moves"])
 
-            choiced = choice(ia_valid_moves)
-            choiced_piece = choiced["piece"]
-            choiced_move_row, choiced_move_col = choice(choiced["moves"])
+        # print(choiced_piece, choiced_move_row, choiced_move_col)
+        jump_is_kill_jump = self.board.diags(choiced_piece)[1]
+        self.board.move_piece(choiced_piece, choiced_move_row, choiced_move_col)
+        has_kill_moves = self.board.diags(choiced_piece)[1]
+        self.timer = 0
 
-            # print(choiced_piece, choiced_move_row, choiced_move_col)
-            jump_is_kill_jump = self.board.diags(choiced_piece)[1]
-            self.board.move_piece(choiced_piece, choiced_move_row, choiced_move_col)
-            has_kill_moves = self.board.diags(choiced_piece)[1]
+        while jump_is_kill_jump and has_kill_moves: # vai entrar como True ou False
+            moves, has_kill_moves = self.board.diags(choiced_piece)
+            row, col = choice(moves)
+            self.board.move_piece(choiced_piece, row, col)
+            moves, has_kill_moves = self.board.diags(choiced_piece)
+            self.timer = 0
 
-            if jump_is_kill_jump:
-                while has_kill_moves: # vai entrar como True ou False
-                    print("entrou")
-                    moves, has_kill_moves = self.board.diags(choiced_piece)
-                    row, col = choice(moves)
-                    self.board.move_piece(choiced_piece, row, col)
-                    moves, has_kill_moves = self.board.diags(choiced_piece)
+            if not has_kill_moves:
+                break
 
-                    if not has_kill_moves:
-                        break
-
-            self.turn_controller()
+        self.turn_controller()
 
 
     def on_mouse_release(self, x, y, button, modifiers):
@@ -189,13 +197,21 @@ class Game(arcade.View):
             has_kill_moves = self.board.diags(self.selected_piece)[1]
             self.is_killing = True if jump_is_kill_jump and has_kill_moves else False
 
-            if not jump_is_kill_jump or not has_kill_moves and not self.is_killing:
+            if self.selected_piece.letra == self.player_turn == "W" and self.selected_piece.row == 7:
+                self.selected_piece = None
+                self.turn_controller()
+                self.is_killing = False
+            
+            elif self.selected_piece.letra == self.player_turn == "R" and self.selected_piece.row == 0:
+                self.selected_piece = None
+                self.turn_controller()
+                self.is_killing = False
+
+            elif not jump_is_kill_jump or not has_kill_moves and not self.is_killing:
                 # logica dos pulos consecutivos
                 self.selected_piece = None
                 self.turn_controller()
                 self.is_killing = False
-                # ia here
-                self.ia_move()
             print(self.is_killing)
 
         elif isinstance(get_piece, Piece) and get_piece.letra == self.player_turn:
